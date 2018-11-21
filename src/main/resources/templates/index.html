@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/main.css" />
 </head>
 <body>
-
+<h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash"></h3>
 <div>
     <h3 th:text="${page.number+1} + ' of ' + ${page.totalPages}" />
 </div>
@@ -27,5 +27,10 @@
 
     </tbody>
 </table>
+
+<form method="post" enctype="multipart/form-data" action="/images" >
+    <p><input type="file" name="file" /> </p>
+    <p><input type="submit" value="Upload" /> </p>
+</form>
 </body>
 </html>

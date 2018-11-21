@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,28 +64,15 @@ public class HomeController {
 
 
     @RequestMapping(method = RequestMethod.POST, value = BASE_PATH)
-    @ResponseBody
-    public ResponseEntity<?> createFile(@RequestParam("file")MultipartFile file, HttpServletRequest servletRequest){
+    public String createFile(@RequestParam("file")MultipartFile file, RedirectAttributes redirectAttributes){
 
         try{
             imageService.createImage(file);
-
-            final URI locationUrl = new URI(servletRequest.getRequestURL().toString() + "/")
-                    .resolve(file.getOriginalFilename()+"/raw");
-            /*
-            final URL locationUrl = new URL(servletRequest.getRequestURL().toString() + "/")
-                    .resolve(file.getOriginalFilename() + "/raw");
-*/
-            return  ResponseEntity.created(locationUrl)
-                    .body("SUCCESSFULLY CREATED "+file.getOriginalFilename());
-
+            redirectAttributes.addFlashAttribute("flash.message", "Successfully uploaded " + file.getOriginalFilename());
         } catch (IOException e) {
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload " + file.getOriginalFilename() + " => " + e.getMessage() );
-        } catch (URISyntaxException e) {
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload " + file.getOriginalFilename() + " => " + e.getMessage() );
+            redirectAttributes.addFlashAttribute("flash.message", "failed to upload " + file.getOriginalFilename());
         }
+        return "redirect:/";
 
     }
 
