@@ -6,6 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -31,14 +33,20 @@ public class ImageService {
         this.resourceLoader = resourceLoader;
     }
 
+    public Page<Image> findPage(Pageable pageable){
+        return imageRepository.findAll(pageable);
+    }
+
     public Resource findOneImage(String filename){
         return resourceLoader.getResource("file:" + UPLOAD_ROOT +"/" + filename);
     }
     public void createImage(MultipartFile file) throws IOException {
-        if(file.isEmpty()){
+
+        if(!file.isEmpty()){
             Files.copy(file.getInputStream(), Paths.get(UPLOAD_ROOT, file.getOriginalFilename()));
             imageRepository.save(new Image(file.getOriginalFilename()));
         }
+
     }
     public void deleteImage(String fileName) throws IOException {
         final Image byName = imageRepository.findByName(fileName);

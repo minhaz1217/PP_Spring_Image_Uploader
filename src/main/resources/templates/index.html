@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xml:th="http://www.thmyeleaf.org" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <title>PP_Spring_Image_Upload</title>
+    <link rel="stylesheet" href="/main.css" />
+</head>
+<body>
+
+<div>
+    <h3 th:text="${page.number+1} + ' of ' + ${page.totalPages}" />
+</div>
+<table>
+    <thead>
+    <tr>
+        <td>Id</td>
+        <td>Name</td>
+        <td>Image</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="image :${page.content}">
+        <td th:text="${image.id}"></td>
+        <td th:text="${image.name}"></td>
+        <td><img class="thumbnail" th:src="@{'/images/'+ ${image.name} + '/raw/' }" /></td>
+    </tr>
+
+    </tbody>
+</table>
+</body>
+</html>

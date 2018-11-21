@@ -2,22 +2,30 @@ package io.github.minhaz1217.PP_SPRING_IMAGE_UPLOAD;
 
 
 import com.fasterxml.jackson.databind.ser.Serializers;
+import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.Request;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.Response;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 @Controller
 public class HomeController {
@@ -29,6 +37,13 @@ public class HomeController {
     @Autowired
     public HomeController(ImageService imageService){
         this.imageService = imageService;
+    }
+
+    @RequestMapping(value = "/")
+    public String index(Model model, Pageable pageable){
+        final Page<Image> page = imageService.findPage(pageable);
+        model.addAttribute("page", page);
+        return "index";
     }
 
     @RequestMapping(method = RequestMethod.GET, value = BASE_PATH + "/" + FILENAME + "/raw")
@@ -49,16 +64,28 @@ public class HomeController {
 
     @RequestMapping(method = RequestMethod.POST, value = BASE_PATH)
     @ResponseBody
-    public ResponseEntity<?> createFile(@RequestParam("file")MultipartFile file, HttpRequest request){
+    public ResponseEntity<?> createFile(@RequestParam("file")MultipartFile file, HttpServletRequest servletRequest){
+
         try{
             imageService.createImage(file);
-            return ResponseEntity.created(request.getURI().resolve(file.getOriginalFilename() + "/raw"))
-                    .body("SUCCESSFULLY UPLOADED " + file.getOriginalFilename());
+
+            final URI locationUrl = new URI(servletRequest.getRequestURL().toString() + "/")
+                    .resolve(file.getOriginalFilename()+"/raw");
+            /*
+            final URL locationUrl = new URL(servletRequest.getRequestURL().toString() + "/")
+                    .resolve(file.getOriginalFilename() + "/raw");
+*/
+            return  ResponseEntity.created(locationUrl)
+                    .body("SUCCESSFULLY CREATED "+file.getOriginalFilename());
 
         } catch (IOException e) {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to upload " + file.getOriginalFilename() + " => " + e.getMessage() );
+        } catch (URISyntaxException e) {
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to upload " + file.getOriginalFilename() + " => " + e.getMessage() );
         }
+
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = BASE_PATH + "/" + FILENAME)

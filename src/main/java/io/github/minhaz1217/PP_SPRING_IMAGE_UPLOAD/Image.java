@@ -15,6 +15,7 @@ public class Image {
     }
     public Image(String name){
         this.name = name;
+
     }
 
     public Long getId() {
