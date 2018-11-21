@@ -9,6 +9,7 @@
 <h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash"></h3>
 <div>
     <h3 th:text="${page.number+1} + ' of ' + ${page.totalPages}" />
+    <h4 th:text="${page.size} + ' item(s) per page ' "/>
 </div>
 <table>
     <thead>
@@ -32,6 +33,11 @@
 
     </tbody>
 </table>
+
+<ul>
+    <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize}, page= ${prev.pageNumber})}" >Prev</a></li>
+    <li th:if="${next}"><a th:href="@{/(size=${next.pageSize}, page= ${next.pageNumber})}" >next</a></li>
+</ul>
 
 <form method="post" enctype="multipart/form-data" action="/images" >
     <p><input type="file" name="file" /> </p>
