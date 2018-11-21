@@ -23,6 +23,11 @@
         <td th:text="${image.id}"></td>
         <td th:text="${image.name}"></td>
         <td><img class="thumbnail" th:src="@{'/images/'+ ${image.name} + '/raw/' }" /></td>
+        <td>
+            <form th:method="delete" th:action="@{'/images/' + ${image.name}}">
+                <input type="submit" value="Delete" />
+            </form>
+        </td>
     </tr>
 
     </tbody>
