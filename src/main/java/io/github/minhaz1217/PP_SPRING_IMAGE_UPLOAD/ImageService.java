@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -27,10 +28,12 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final ResourceLoader resourceLoader;
 
+    private final SimpMessagingTemplate simpleMessagingTemplate;
     @Autowired
-    public ImageService(ImageRepository repository, ResourceLoader resourceLoader){
+    public ImageService(ImageRepository repository, ResourceLoader resourceLoader, SimpMessagingTemplate simpleMessagingTemplate){
         this.imageRepository = repository;
         this.resourceLoader = resourceLoader;
+        this.simpleMessagingTemplate = simpleMessagingTemplate;
     }
 
     public Page<Image> findPage(Pageable pageable){
@@ -45,6 +48,9 @@ public class ImageService {
         if(!file.isEmpty()){
             Files.copy(file.getInputStream(), Paths.get(UPLOAD_ROOT, file.getOriginalFilename()));
             imageRepository.save(new Image(file.getOriginalFilename()));
+            simpleMessagingTemplate.convertAndSend("/topic/newImage", file.getOriginalFilename() );
+
+
         }
 
     }
@@ -52,6 +58,8 @@ public class ImageService {
         final Image byName = imageRepository.findByName(fileName);
         imageRepository.delete(byName);
         Files.delete(Paths.get(UPLOAD_ROOT, fileName));
+        simpleMessagingTemplate.convertAndSend("/topic/newImage", fileName );
+
     }
 
     @Bean
