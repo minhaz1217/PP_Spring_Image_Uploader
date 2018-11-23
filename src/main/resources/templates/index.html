@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>PP_Spring_Image_Upload</title>
     <link rel="stylesheet" href="/main.css" />
+    <script type="text/javascript" src="webjars/requirejs/2.3.6/require.min.js"></script>
+    <script type="text/javascript" src=""></script>
 </head>
 <body>
 <h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash"></h3>
@@ -43,5 +45,32 @@
     <p><input type="file" name="file" /> </p>
     <p><input type="submit" value="Upload" /> </p>
 </form>
+<script th:inline="javascript">
+ /*<![CDATA[*/
+ (
+     function(){
+        window.require(["webjars/stomp-websocket/2.3.3/stomp.min.js","webjars/sockjs-client/1.1.5/dist/sockjs.js"],
+            function(stomp, SockJS){
+                var socket = SockJS("/imageMessage");
+                var stompClient = Stomp.over(socket);
+
+                var redrawCurrentPage = function(message){
+                    console.log(message);
+                    window.location =  /* [[@{/(size=${page.size}, page=${page.number})}]] */"";
+                }
+                stompClient.connect({/* */}, function(frame){
+                    stompClient.subscribe("/topic/newImage", redrawCurrentPage);
+                    stompClient.subscribe("/topic/deleteImage", redrawCurrentPage);
+                });
+            });
+     }
+ )();
+
+ /*]]>*/
+
+</script>
+
+
+
 </body>
 </html>
