@@ -33,10 +33,10 @@ Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]<
 <div sec:authorize="isAuthenticated()">
     This content is only shown to authenticated users.
 </div>
-<div sec:authorize="hasRole('ROLE_ADMIN')">
+<div sec:authorize="hasRole('ADMIN')">
     This content is only shown to administrators.
 </div>
-<div sec:authorize="hasRole('ROLE_USER')">
+<div sec:authorize="hasRole('USER')">
     This content is only shown to users.
 </div>
 

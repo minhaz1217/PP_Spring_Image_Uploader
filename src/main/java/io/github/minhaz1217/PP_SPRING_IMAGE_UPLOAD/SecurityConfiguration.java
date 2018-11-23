@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     @Override
@@ -22,7 +24,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .permitAll();
     }
     @Autowired
-    public void configureInMemoryUsers(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureJPABasedUsers(AuthenticationManagerBuilder auth,
+                                       UserDetailsService  userDetailsService) throws Exception {
+
+
+        auth.userDetailsService(userDetailsService);
+
+        /*
         User.withDefaultPasswordEncoder().username("user").password("user").roles("USER").build();
 
 
@@ -40,15 +48,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
         User.withUsername("123").password("123").roles("USER").disabled(true);
         User.withUsername("asd").password("asd").roles("USER").accountLocked(true);
         */
-
+        /*
         auth.inMemoryAuthentication()
-                .passwordEncoder(NoOpPasswordEncoder.getInstance()).withUser("greg").password("temp").roles("ADMIN", "USER")
+                .passwordEncoder(NoOpPasswordEncoder.getInstance()).withUser("temp").password("temp").roles("ADMIN", "USER")
         .and()
                 .passwordEncoder(NoOpPasswordEncoder.getInstance()).withUser("myuser").password("myuser").roles("USER")
         .and()
                 .passwordEncoder(NoOpPasswordEncoder.getInstance()).withUser("123").password("123").roles("USER").disabled(true)
         .and()
                 .passwordEncoder(NoOpPasswordEncoder.getInstance()).withUser("asd").password("asd").roles("USER").accountLocked(true);
+                */
 
     }
 }
