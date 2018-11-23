@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xml:th="http://www.thmyeleaf.org" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <meta charset="UTF-8" />
     <title>PP_Spring_Image_Upload</title>
@@ -8,6 +10,42 @@
     <script type="text/javascript" src=""></script>
 </head>
 <body>
+
+<div>
+    <span th:text ="authorities.name"></span>
+    <span th:text ="authenticated.name"></span>
+    <span sec:authentication="name" /> has <span sec:authentication="authorities" />
+</div>
+
+Logged user: <span sec:authentication="name">Bob</span>
+Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
+
+
+
+
+<div>
+    <span sec:text="principal.getUsername()">asdsad</span> has <span sec:authentication="principal.getAuthorities()" >HELLO </span>
+    <form method="post" th:action="@{/logout}" >
+        <input type="submit" value="Sign Off" />
+    </form>
+</div>
+
+<div sec:authorize="isAuthenticated()">
+    This content is only shown to authenticated users.
+</div>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    This content is only shown to administrators.
+</div>
+<div sec:authorize="hasRole('ROLE_USER')">
+    This content is only shown to users.
+</div>
+
+
+<h1>
+    Learning Spring
+</h1>
+
+
 <h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash"></h3>
 <div>
     <h3 th:text="${page.number+1} + ' of ' + ${page.totalPages}" />
