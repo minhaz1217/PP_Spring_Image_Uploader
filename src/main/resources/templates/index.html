@@ -56,6 +56,7 @@ Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]<
     <tr>
         <td>Id</td>
         <td>Name</td>
+        <td>Owner</td>
         <td>Image</td>
     </tr>
     </thead>
@@ -63,6 +64,7 @@ Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]<
     <tr th:each="image :${page.content}">
         <td th:text="${image.id}"></td>
         <td th:text="${image.name}"></td>
+        <td th:text="${image.owner.username}"></td>
         <td><a th:href="@{'/images/'+ ${image.name} + '/raw/' }"><img class="thumbnail" th:src="@{'/images/'+ ${image.name} + '/raw/' }" /></a></td>
         <td>
             <form th:method="delete" th:action="@{'/images/' + ${image.name}}">
@@ -79,7 +81,7 @@ Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]<
     <li th:if="${next}"><a th:href="@{/(size=${next.pageSize}, page= ${next.pageNumber})}" >next</a></li>
 </ul>
 
-<form method="post" enctype="multipart/form-data" action="/images" >
+<form method="post" enctype="multipart/form-data" th:action="@{/images}" >
     <p><input type="file" name="file" /> </p>
     <p><input type="submit" value="Upload" /> </p>
 </form>

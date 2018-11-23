@@ -1,6 +1,5 @@
 package io.github.minhaz1217.PP_SPRING_IMAGE_UPLOAD;
 
-import org.apache.tomcat.util.http.fileupload.UploadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +8,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,12 +29,13 @@ public class ImageService {
     private static String UPLOAD_ROOT = "upload-dir";
     private final ImageRepository imageRepository;
     private final ResourceLoader resourceLoader;
-
+    private final UserRepository userRepository;
     private final SimpMessagingTemplate simpleMessagingTemplate;
     @Autowired
-    public ImageService(ImageRepository repository, ResourceLoader resourceLoader, SimpMessagingTemplate simpleMessagingTemplate){
+    public ImageService(ImageRepository repository, ResourceLoader resourceLoader, UserRepository userRepository, SimpMessagingTemplate simpleMessagingTemplate){
         this.imageRepository = repository;
         this.resourceLoader = resourceLoader;
+        this.userRepository = userRepository;
         this.simpleMessagingTemplate = simpleMessagingTemplate;
     }
 
@@ -50,7 +50,8 @@ public class ImageService {
 
         if(!file.isEmpty()){
             Files.copy(file.getInputStream(), Paths.get(UPLOAD_ROOT, file.getOriginalFilename()));
-            imageRepository.save(new Image(file.getOriginalFilename()));
+            imageRepository.save(new Image(file.getOriginalFilename(),
+                    userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())));
             simpleMessagingTemplate.convertAndSend("/topic/newImage", file.getOriginalFilename() );
 
 
@@ -72,16 +73,19 @@ public class ImageService {
         return (args) -> {
             FileSystemUtils.deleteRecursively(new File(UPLOAD_ROOT));
             Files.createDirectory(Paths.get(UPLOAD_ROOT));
-            FileCopyUtils.copy("Text File1", new FileWriter(UPLOAD_ROOT + "/test"));
-            repository.save(new Image("test"));
-            FileCopyUtils.copy("Text File2", new FileWriter(UPLOAD_ROOT + "/test2"));
-            repository.save(new Image("test2"));
-            FileCopyUtils.copy("Text File3", new FileWriter(UPLOAD_ROOT + "/test3"));
-            repository.save(new Image("test3"));
+
+
             User temp = userRepository.save(new User("temp", encoder.encode("temp"), "ROLE_ADMIN", "ROLE_USER"));
             User u1 = userRepository.save(new User("1", encoder.encode("1"), "ROLE_ADMIN", "ROLE_USER"));
             User u123 = userRepository.save(new User("123", encoder.encode("123"),  "ROLE_USER"));
             User asd = userRepository.save(new User("asd", encoder.encode("asd"), "ROLE_ADMIN", "ROLE_USER"));
+
+            FileCopyUtils.copy("Text File1", new FileWriter(UPLOAD_ROOT + "/test"));
+            repository.save(new Image("test", temp));
+            FileCopyUtils.copy("Text File2", new FileWriter(UPLOAD_ROOT + "/test2"));
+            repository.save(new Image("test2", u123));
+            FileCopyUtils.copy("Text File3", new FileWriter(UPLOAD_ROOT + "/test3"));
+            repository.save(new Image("test3",asd));
 
         };
 
