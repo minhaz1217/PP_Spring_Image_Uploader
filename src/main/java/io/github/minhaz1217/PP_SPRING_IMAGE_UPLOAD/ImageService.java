@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -88,10 +89,16 @@ public class ImageService {
             repository.save(new Image("test3",asd));
 
         };
-
-
-
     }
+    /*
+    @Bean
+    public SpringTemplateEngine templateEngine(org.thymeleaf.templateresolver.DefaultTemplateResolver templateResolver) {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        templateEngine.addDialect(new SpringSecurityDialect());
+        return templateEngine;
+    }
+    */
 
 
 

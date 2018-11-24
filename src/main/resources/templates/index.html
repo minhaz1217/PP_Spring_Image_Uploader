@@ -2,6 +2,10 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<!--
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+ xmlns:sec="http://www.thymeleaf.org/extras/spring-security"-->
 <head>
     <meta charset="UTF-8" />
     <title>PP_Spring_Image_Upload</title>
@@ -16,7 +20,9 @@
     <span th:text ="authenticated.name"></span>
     <span sec:authentication="name" /> has <span sec:authentication="authorities" />
 </div>
-
+<sec:authorize access="hasRole('ROLE_ADMIN') and hasRole('ROLE_USER')">
+    <p>Must have ROLE_ADMIN and ROLE_USER</p>
+</sec:authorize>
 Logged user: <span sec:authentication="name">Bob</span>
 Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
 
@@ -25,7 +31,7 @@ Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]<
 
 <div>
     <span sec:text="principal.getUsername()">asdsad</span> has <span sec:authentication="principal.getAuthorities()" >HELLO </span>
-    <form method="post" th:action="@{/logout}" >
+    <form sec:authorize-expp="isFullyAuthenticated()" method="post" th:action="@{/logout}" >
         <input type="submit" value="Sign Off" />
     </form>
 </div>
